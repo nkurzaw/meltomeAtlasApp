@@ -9,6 +9,7 @@
 
 library(shiny)
 library(dplyr)
+library(ggplot2)
 
 # load data
 dataTab <- readRDS("data/smallHumanCellTypesDf.rds")
