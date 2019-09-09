@@ -12,9 +12,12 @@ library(dplyr)
 library(ggplot2)
 
 # load data
-dataTab <- readRDS("data/smallHumanCellTypesDf.rds")
-speciesDataTab <- readRDS("data/speciesMeltomeDf.rds")
-
+humanDataTab <- reactive(readRDS("/home/nils/projects/meltomeatlasapp/data/humanCellsUpdated.rds"))
+speciesDataTab <- reactive(readRDS("/home/nils/projects/meltomeatlasapp/data/fullSpeciesDat.rds"))
+humanCellsTmSpread <- reactive(readRDS("/home/nils/projects/meltomeatlasapp/data/humanCellsTmSpread.rds"))
+all_human_gene_names <- readRDS("/home/nils/projects/meltomeatlasapp/data/uniqueHumanGeneNames.rds")
+#all_species_gene_names <- readRDS("/home/nils/projects/meltomeatlasapp/data/uniqueSpeciesGeneNames.rds")
+  
 # Define UI for application that draws a histogram
 ui <- navbarPage("Meltome Atlas",
                  tabPanel("Home",
@@ -24,18 +27,25 @@ ui <- navbarPage("Meltome Atlas",
                           sidebarLayout(
                             
                             sidebarPanel(
-                              "This R-Shiny App allows interactive exploration of the dataset published by Jarzab et al., (2019). 
-                              
-                              Have fun!"
+                              tagList(
+                                fluidRow("This R-Shiny App allows interactive exploration of the dataset published by Jarzab et al., (2019)."),
+                                tags$br(),
+                                fluidRow("The different tabs lead you to exploring the either the comparison of thermal proteome profiles across various species or across different human cell lines and cell types."),
+                                tags$br(),
+                                fluidRow("Have fun!"))
                               ),
                             
                             mainPanel(
-                              "The different tabs lead you to exploring the either the comparison of thermal proteome profiles across various species or across different human cell lines and cell types."
+                              img(
+                                src = "meltome_atlas_fig1a.png",
+                                align = "center",
+                                width = "743px", height = "500px"
+                              )
                             )
                           )
                           ),
                  tabPanel("Cross-species Meltome",
-                          titlePanel("Plot protein of interest in different species"),
+                          titlePanel("Plot proteins of interest in different species"),
                           
                           sidebarLayout(
                             sidebarPanel(
@@ -49,8 +59,15 @@ ui <- navbarPage("Meltome Atlas",
                                                       "Drosophila melanogaster SII lysate",
                                                       "Caenorhabditis elegans lysate",
                                                       "Danio rerio Zenodo lysate",
-                                                      "Homo sapiens A549 lysate",
-                                                      "Homo sapiens Jurkat lysate",
+                                                      "Mus musculus liver lysate",
+                                                      "Geobacillus stearothermophilus NCA26 lysate",
+                                                      "Thermus thermophilus HB27 lysate",
+                                                      "Thermus thermophilus HB27 cells", 
+                                                      "Picrophilus torridus DSM9790 lysate",
+                                                      "Homo sapiens Jurkat NP40 lysate",
+                                                      "Homo sapiens K562 PBS lysate",
+                                                      "Homo sapiens Jurkat cells",
+                                                      "Homo sapiens K562 cells", 
                                                       "Mus musculus BMDC lysate"), 
                                           selected = "Drosophila melanogaster SII lysate"),
                               
@@ -62,8 +79,15 @@ ui <- navbarPage("Meltome Atlas",
                                                       "Drosophila melanogaster SII lysate",
                                                       "Caenorhabditis elegans lysate",
                                                       "Danio rerio Zenodo lysate",
-                                                      "Homo sapiens A549 lysate",
-                                                      "Homo sapiens Jurkat lysate",
+                                                      "Mus musculus liver lysate",
+                                                      "Geobacillus stearothermophilus NCA26 lysate",
+                                                      "Thermus thermophilus HB27 lysate",
+                                                      "Thermus thermophilus HB27 cells", 
+                                                      "Picrophilus torridus DSM9790 lysate",
+                                                      "Homo sapiens Jurkat NP40 lysate",
+                                                      "Homo sapiens K562 PBS lysate",
+                                                      "Homo sapiens Jurkat cells",
+                                                      "Homo sapiens K562 cells", 
                                                       "Mus musculus BMDC lysate",
                                                       ""), 
                                           selected = "Mus musculus BMDC lysate"),
@@ -76,30 +100,58 @@ ui <- navbarPage("Meltome Atlas",
                                                       "Drosophila melanogaster SII lysate",
                                                       "Caenorhabditis elegans lysate",
                                                       "Danio rerio Zenodo lysate",
-                                                      "Homo sapiens A549 lysate",
-                                                      "Homo sapiens Jurkat lysate",
+                                                      "Mus musculus liver lysate",
+                                                      "Geobacillus stearothermophilus NCA26 lysate",
+                                                      "Thermus thermophilus HB27 lysate",
+                                                      "Thermus thermophilus HB27 cells", 
+                                                      "Picrophilus torridus DSM9790 lysate",
+                                                      "Homo sapiens Jurkat NP40 lysate",
+                                                      "Homo sapiens K562 PBS lysate",
+                                                      "Homo sapiens Jurkat cells",
+                                                      "Homo sapiens K562 cells", 
                                                       "Mus musculus BMDC lysate"), 
-                                          selected = "Homo sapiens Jurkat lysate"),
+                                          selected = "Homo sapiens Jurkat cells"),
                               
-                              textInput("gene_name1", 
+                              
+                              textInput("gene_name1",
                                         label = NULL,
                                         value = "MTOR"),
-                                        # placeholder = 'Gene name (e.g. MTOR)'),
-                              
-                              textInput("gene_name2", 
+                                        # placeholder = 'Gene symbol (e.g. Mtor)'),
+                              # selectizeInput(
+                              #   "gene_name1", label = NULL, choices = all_species_gene_names,
+                              #   options = list(create = TRUE),
+                              #   selected = "Mtor"
+                              # ),
+                              textInput("gene_name2",
                                         label = NULL,
-                                        placeholder = 'Gene name (e.g. CDK1)'),
+                                        placeholder = 'Gene symbol (e.g. CDK1)'),
                               
-                              textInput("gene_name3", 
+                              textInput("gene_name3",
                                         label = NULL,
-                                        placeholder = 'Gene name (e.g. CCNB2)')
+                                        placeholder = 'Gene symbol (e.g. CCNB2)')
+                              
+                              # selectizeInput(
+                              #   "gene_name2", label = NULL, choices = all_species_gene_names,
+                              #   options = list(create = TRUE),
+                              #   selected = ""
+                              # ),
+                              # 
+                              # selectizeInput(
+                              #   "gene_name3", label = NULL, choices = all_species_gene_names,
+                              #   options = list(create = TRUE),
+                              #   selected = ""
+                              # )
                               
                             ),
                             
                             mainPanel(
-                              plotOutput("species_melt_curve_plot1")
+                              plotOutput("species_melt_curve_plot1"),
+                              fluidRow(
+                                column(12, 
+                                       tableOutput('table')
+                                )
                             )
-                          )),
+                          ))),
                  tabPanel("Human cell line Meltome",
                           titlePanel("Plot protein of interest in different human cell lines"),
   
@@ -128,15 +180,25 @@ ui <- navbarPage("Meltome Atlas",
                               "HL60", "colon_cancer_spheroids"), 
                   selected = "pTcells"),
       
-      textInput("protein", 
-                label = NULL,
-                value = "JAK1")
-                # placeholder = 'Gene name (e.g. ABL1)')
       
+      selectizeInput(
+        "protein", label = NULL, choices = all_human_gene_names,
+        options = list(create = TRUE),
+        selected = "JAK1"
+      )
+    #   textInput("protein",
+    #             label = NULL,
+    #             value = "JAK1")
+    #             # placeholder = 'Gene symbol (e.g. ABL1)')
     ),
     
     mainPanel(
-      plotOutput("melt_curve_plot1")
+      plotOutput("melt_curve_plot1"),
+      fluidRow(
+        column(12, 
+               tableOutput('table2')
+        )
+      )
     )
   ),
   
@@ -154,27 +216,76 @@ ui <- navbarPage("Meltome Atlas",
                   selected = "Jurkat"),
       
       
-      textInput("protein1", 
-                label = NULL,
-                #placeholder = 'Protein (e.g. ABL1)',
-                value = "ABL1"),
+      selectizeInput(
+        "protein1", label = NULL, choices = all_human_gene_names,
+        options = list(create = TRUE),
+        selected = "AAAS"
+      ),
+      # textInput("protein1",
+      #           label = NULL,
+      #           #placeholder = 'Protein (e.g. ABL1)',
+      #           value = "ABL1"),
       
-      textInput("protein2", 
-                label = NULL,
-                value = "BCR"),
-                # placeholder = 'Gene name (e.g. ABL1)'),
+      # textInput("protein2",
+      #           label = NULL,
+      #           value = "BCR"),
+      #           # placeholder = 'Gene symbol (e.g. ABL1)'),
+      selectizeInput(
+        "protein2", label = NULL, choices = all_human_gene_names,
+        options = list(create = TRUE),
+        selected = "ABL1"
+      ),
       
-      textInput("protein3", 
-                label = NULL,
-                placeholder = 'Gene name (e.g. JAK1)')
+      # textInput("protein3",
+      #           label = NULL,
+      #           placeholder = 'Gene symbol (e.g. JAK1)')
+      
+      selectizeInput(
+        "protein3", label = NULL, choices = all_human_gene_names,
+        options = list(create = TRUE),
+        selected = "BCR"
+      )
+      
     ),
     
     mainPanel(
-      plotOutput("melt_curve_plot2")
+      plotOutput("melt_curve_plot2"),
+      fluidRow(
+        column(12, 
+               tableOutput('table3')
+        )
+      )
     )
-  )
+  ),
+  titlePanel("Scatterplot of protein melting points in desired cell lines"),
+
+  sidebarLayout(
+    sidebarPanel(
+      helpText("Select cell lines"),
+
+      selectInput("selectCellTm1", "Select a cell line",
+                  choices = c("K562", "Jurkat", "HepG2",
+                              "HaCaT", "U937", "K562",
+                              "HAOEC", "pTcells", "HEK293T",
+                              "HL60", "colon_cancer_spheroids"),
+                  selected = "Jurkat"),
+
+
+      selectInput("selectCellTm2", "Select a cell line",
+                  choices = c("K562", "Jurkat", "HepG2",
+                              "HaCaT", "U937", "K562",
+                              "HAOEC", "pTcells", "HEK293T",
+                              "HL60", "colon_cancer_spheroids"),
+                  selected = "HepG2")
+
+    ),
+
+    mainPanel(
+      plotOutput("tm_scatter")
+        )
+      )
+
 ), 
-# tabPanel("Human body fluid Meltome"),
 tabPanel("Download",
          sidebarLayout(
            
@@ -193,10 +304,10 @@ tabPanel("Download",
            # Main panel for displaying outputs ----
            mainPanel(
              
-             # tableOutput("table")
-             
            ))
-)
+         
+    )
+
 )
 
 # Server logic ----
@@ -204,54 +315,96 @@ server <- function(input, output) {
   
   output$melt_curve_plot1 <- renderPlot({
     
-    ggplot(filter(dataTab, cellLine %in% c(input$selectCell1, input$selectCell2, 
+    ggplot(filter(humanDataTab(), cell_line_or_type %in% c(input$selectCell1, input$selectCell2, 
                                            input$selectCell3), 
-                  Protein_ID == input$protein), 
+                  toupper(gene_name) == toupper(input$protein)), 
            aes(temperature, as.numeric(fold_change))) +
-      geom_point(aes(color = cellLine), size = 3, alpha = 0.75) +
-      labs(x = expression('Temperature ('*~degree*C*')'), y = "fraction non-denatured") +
-      stat_summary(aes(color = cellLine), geom="line", fun.y="median") +
+      geom_point(aes(color = cell_line_or_type), size = 3, alpha = 0.75) +
+      labs(x = expression('Temperature ('*~degree*C*')'), y = "Fraction non-denatured") +
+      stat_summary(aes(color = cell_line_or_type), geom="line", fun.y="median") +
+      scale_color_discrete("Cell line/type") +
       theme_bw() + 
       theme(text = element_text(size = 20))
     
   })
   
+  output$table2 <- renderTable(filter(humanDataTab(), cell_line_or_type %in% c(input$selectCell, input$selectCell2, 
+                                                                                   input$selectCell3), 
+                                          toupper(gene_name) == toupper(input$protein)) %>% 
+                                     group_by(cell_line_or_type) %>% 
+                                     summarize(Tm = round(median(meltPoint, na.rm = TRUE), 2)) %>% 
+                                     dplyr::select_("Cell line/type" = "cell_line_or_type", "Tm"))
+  
   output$melt_curve_plot2 <- renderPlot({
     
-    ggplot(filter(dataTab, cellLine == input$selectCell, 
-                  Protein_ID %in% c(input$protein1, input$protein2,
-                                    input$protein3)), 
+    ggplot(filter(humanDataTab(), cell_line_or_type == input$selectCell, 
+                  toupper(gene_name) %in% toupper(c(input$protein1, input$protein2,
+                                    input$protein3))), 
            aes(temperature, as.numeric(fold_change))) +
-      geom_point(aes(color = Protein_ID), size = 3, alpha = 0.75) +
-      labs(x = expression('Temperature ('*~degree*C*')'), y = "fraction non-denatured") +
-      stat_summary(aes(color = Protein_ID), geom="line", fun.y="median") +
+      geom_point(aes(color = gene_name), size = 3, alpha = 0.75) +
+      labs(x = expression('Temperature ('*~degree*C*')'), y = "Fraction non-denatured") +
+      stat_summary(aes(color = gene_name), geom="line", fun.y="median") +
+      scale_color_discrete("Gene symbol") +
       theme_bw() + 
+      theme(text = element_text(size = 20))
+    
+  })
+  
+  output$table3 <- renderTable(filter(humanDataTab(), cell_line_or_type == input$selectCell,
+                                      toupper(gene_name) %in% toupper(c(input$protein1, input$protein2,
+                                                                        input$protein3))) %>%
+                                     group_by(gene_name) %>%
+                                     summarize(Tm = round(median(meltPoint, na.rm = TRUE), 2)) %>%
+                                     dplyr::select_("Gene symbol" = "gene_name", "Tm"))
+  
+  output$tm_scatter <- renderPlot({
+    
+    ggplot(humanCellsTmSpread(), aes_string(input$selectCellTm1, input$selectCellTm2)) + 
+      geom_point() +
+      coord_fixed() +
+      labs(x = bquote(.(input$selectCellTm1) ~ Tm ~ degree*C),
+           y = bquote(.(input$selectCellTm2) ~ Tm ~ degree*C)) +
+      theme_bw()  + 
       theme(text = element_text(size = 20))
     
   })
   
   output$species_melt_curve_plot1 <- renderPlot({
     
-    ggplot(filter(speciesDataTab, run_name %in% c(input$selectSpecies1, input$selectSpecies2, 
+    ggplot(filter(speciesDataTab(), run_name %in% c(input$selectSpecies1, input$selectSpecies2, 
                                            input$selectSpecies3), 
-                  protein %in% c(input$gene_name1, input$gene_name2,
-                                 input$gene_name3)), 
+                  toupper(gene_name) %in% toupper(c(input$gene_name1, input$gene_name2,
+                                 input$gene_name3))), 
            aes(temperature, as.numeric(fold_change))) +
-      geom_point(aes(color = run_name, shape = protein), 
+      geom_point(aes(color = run_name, shape = gene_name), 
                  size = 3, alpha = 0.75) +
-      labs(x = expression('Temperature ('*~degree*C*')'), y = "fraction non-denatured") +
-      stat_summary(aes(color = run_name, linetype = protein), geom="line", fun.y="median") +
-      scale_color_discrete("species") +
+      labs(x = expression('Temperature ('*~degree*C*')'), y = "Fraction non-denatured") +
+      stat_summary(aes(color = run_name, linetype = gene_name), geom="line", fun.y="median") +
+      scale_color_discrete("Species") +
+      scale_linetype_discrete("Gene symbol") +
+      scale_shape_discrete("Gene symbol") +
       theme_bw() + 
-      theme(text = element_text(size = 20))
+      theme(text = element_text(size = 20),
+            legend.position = "bottom",
+            legend.direction = "horizontal",
+            legend.box = "vertical")
     
   })
+  
+  output$table <- renderTable(filter(speciesDataTab(), run_name %in% c(input$selectSpecies1, input$selectSpecies2, 
+                                                                       input$selectSpecies3), 
+                                     toupper(gene_name) %in% toupper(c(input$gene_name1, input$gene_name2,
+                                                                       input$gene_name3))) %>% 
+                                 group_by(run_name, gene_name) %>% 
+                                 summarize(Tm = round(median(meltPoint, na.rm = TRUE), 2)) %>% 
+                                 dplyr::select_("Species" = "run_name", "Gene symbol" = "gene_name", "Tm"))
+  
   
   # Reactive value for selected dataset ----
   datasetInput <- reactive({
     switch(input$dataset,
-           "cross-species" = speciesDataTab,
-           "human" = dataTab)
+           "cross-species" = speciesDataTab(),
+           "human" = humanDataTab())
   })
   
   # Downloadable csv of selected dataset ----
