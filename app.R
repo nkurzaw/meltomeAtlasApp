@@ -12,10 +12,10 @@ library(dplyr)
 library(ggplot2)
 
 # load data
-humanDataTab <- reactive(readRDS("/home/nils/projects/meltomeatlasapp/data/humanCellsUpdated.rds"))
-speciesDataTab <- reactive(readRDS("/home/nils/projects/meltomeatlasapp/data/fullSpeciesDat.rds"))
-humanCellsTmSpread <- reactive(readRDS("/home/nils/projects/meltomeatlasapp/data/humanCellsTmSpread.rds"))
-all_human_gene_names <- readRDS("/home/nils/projects/meltomeatlasapp/data/uniqueHumanGeneNames.rds")
+humanDataTab <- reactive(readRDS("/Users/kurzawa/repos/meltomeAtlasApp/data/humanCellsUpdated.rds"))
+speciesDataTab <- reactive(readRDS("/Users/kurzawa/repos/meltomeAtlasApp/data/fullSpeciesDat.rds"))
+humanCellsTmSpread <- reactive(readRDS("/Users/kurzawa/repos/meltomeAtlasApp/data/humanCellsTmSpread.rds"))
+all_human_gene_names <- readRDS("/Users/kurzawa/repos/meltomeAtlasApp/data/uniqueHumanGeneNames.rds")
 #all_species_gene_names <- readRDS("/home/nils/projects/meltomeatlasapp/data/uniqueSpeciesGeneNames.rds")
   
 # Define UI for application that draws a histogram
@@ -28,7 +28,7 @@ ui <- navbarPage("Meltome Atlas",
                             
                             sidebarPanel(
                               tagList(
-                                fluidRow("This R-Shiny App allows interactive exploration of the dataset published by Jarzab et al., (2019)."),
+                                fluidRow("This R-Shiny App allows interactive exploration of the dataset published by Jarzab et al., (2020)."),
                                 tags$br(),
                                 fluidRow("The different tabs lead you to exploring either the comparison of thermal proteome profiles across various species or across different human cell lines and cell types."),
                                 tags$br(),
