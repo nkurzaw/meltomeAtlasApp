@@ -28,7 +28,7 @@ ui <- navbarPage("Meltome Atlas",
                             
                             sidebarPanel(
                               tagList(
-                                fluidRow("This R-Shiny App allows interactive exploration of the dataset published by Jarzab et al., (2020)."),
+                                fluidRow("This R-Shiny App allows interactive exploration of the dataset published by Jarzab et al., (2020), Nat. Methods."),
                                 tags$br(),
                                 fluidRow("The different tabs lead you to exploring either the comparison of thermal proteome profiles across various species or across different human cell lines and cell types."),
                                 tags$br(),
